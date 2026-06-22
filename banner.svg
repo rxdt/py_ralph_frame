@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 160" width="100%">
+  <defs>
+    <linearGradient id="blueG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="35%" stop-color="#38bdf8" />
+      <stop offset="65%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#1e3a8a" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-40%" width="140%" height="180%">
+      <feGaussianBlur stdDeviation="4" result="b" />
+      <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
+    <style>
+      @keyframes flow { to { stroke-dashoffset: -260; } }
+      .loop { stroke-dasharray: 14 12; animation: flow 4s linear infinite; }
+    </style>
+  </defs>
+  <path d="M 140 80 C 140 25, 320 25, 360 80 C 400 135, 580 135, 580 80 C 580 25, 400 25, 360 80 C 320 135, 140 135, 140 80 Z"
+        fill="none" stroke="url(#blueG)" stroke-width="16" stroke-linecap="round" filter="url(#glow)" class="loop" />
+</svg>

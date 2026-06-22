@@ -1,0 +1,191 @@
+[project]
+name = "rxdt"
+version = "0.1.0"
+description = "Gated, harnessed, single-worker autonomy loop (Ralph) scaffold for starting new Python projects."
+authors = []
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "MIT" }
+keywords = ["ralph", "agent", "autonomy", "scaffold", "harness", "llm", "codex", "claude"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Build Tools",
+]
+dependencies = [
+    "pydantic"
+]
+
+[project.scripts]
+ralph = "harness.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "harness",
+]
+
+[dependency-groups]
+dev = [
+    "pylint",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "pyright",
+    "semgrep",
+]
+
+[tool.pyright]
+typeCheckingMode = "strict"
+# Silences third-party untyped library noise
+reportUnknownVariableType = "none"
+reportUnknownArgumentType = "none"
+reportUnknownMemberType = "none"
+reportUnknownParameterType = "none"
+reportUntypedFunctionDecorator = "none"
+reportMissingTypeStubs = "none"
+reportAssertAlwaysTrue = "none"       # Handled by Ruff S101 or B011
+reportUnusedImport = "none"           # Handled by Ruff F401
+reportUnusedVariable = "none"         # Handled by Ruff F841
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+addopts = [
+    "-ra",
+    "--cov",
+    "--cov-report=term-missing",
+    "--cov-fail-under=100",
+]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.coverage.run]
+# Add every directory that ships runnable code here (e.g. "src") as the
+# project grows; the gate enforces 100% coverage on all of it.
+source = ["harness", "src"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 100
+
+[tool.ruff]
+target-version = "py313"
+preview = true
+line-length = 110
+force-exclude = true
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 110          # Enforce W505 for comments and docstrings
+ignore-overlong-task-comments = false  # Do not exempt TODO/FIXME/XXX comments
+
+[tool.pylint.format]
+max-line-length = 110         # Keep Pylint line accounting aligned with Ruff E501
+max-module-lines = 500        # Enable Pylint C0302 because Ruff has no equivalent
+ignore = ["tests"]
+
+# Enforce strict backend rule sets
+[tool.ruff.lint]
+select = [
+    "A",       # flake8-builtins (prevents shadowing Python builtins)
+    "ARG",     # flake8-unused-arguments (dead params and fake extension points)
+    "ASYNC",   # flake8-async (catches blocks/misuse in async frameworks)
+    "ASYNC",   # flake8-async (catches blocks/misuse in async frameworks)
+    "B",       # flake8-bugbear (catches common backend design flaws)
+    "BLE",     # flake8-blind-except (blocks quiet 'except Exception: pass')
+    "C",       # C-prefixed rules, including mccabe and comprehensions
+    "C4",      # flake8-comprehensions (.e.g unnecessary list comprehensions)
+    "C90",     # Enables McCabe cyclomatic complexity checks
+    "COM",     # flake8-commas. Trailing comma added.
+    "D100",    # Files must have module docstrings
+    "D101",    # Classes must have docstrings
+    "D102",    # Methods must have docstrings
+    "D103",    # Functions must have docstrings
+    "D104",    # Packages must have docstrings
+    "DTZ",     # flake8-datetimez (forbid naive datetime usage)
+    "E",       # pycodestyle: Catches objective syntax rule violations
+    "EM",      # flake8-errmsg (keep exception messages clean and reusable)
+    "ERA",     # Catches commented-out code bloat
+    "F",       # Pyflakes (unused imports, undefined variables)
+    "FLY",     # Converts .format() and % string into modern f-string
+    "FURB",    # Modern simplifications, some loop/set mutation patterns
+    "G",       # flake8-logging-format (safe logging format conventions)
+    "I",       # isort (clean, predictable import sorting)
+    "ISC",     # flake8-implicit-str-concat, Catch missing commas in lists
+    "LOG",     # flake8-logging (logging misuse and avoidable root logger use)
+    "LOG",     # Prevents common logging bugs.
+    "N",       # Enable pep8-naming rules globally
+    "PERF",    # Avoids inefficient loop/allocation patterns
+    "PGH",     # pygrep-hooks (blanket suppression hygiene) Bans generic # noqa or # type: ignore
+    "PIE",     # flake8-pie, removes unnecessary code constructs
+    "PLC",     # Pylint convention rules
+    "PLE",     # Pylint error rules
+    "PLR",     # Pylint Refactor (controls complexity and argument bloat)
+    "PLW",     # Pylint warning rules
+    "PT",      # flake8-pytest-style (idiomatic pytest without docstring noise) e.g. pytest.raise not try/except
+    "PTH",     # flake8-use-pathlib (prefer Path over error-prone os/path string handling)
+    "RET",     # Cleaner return flow, fewer lazy else chains.
+    "RSE",     # flake8-raise (clean raise statements)
+    "RUF",     # Ruff-specific rules
+    "S",       # flake8-bandit (security checks: SQLi, hardcoded credentials)
+    "SIM",     # flake8-simplify (prefer simpler control flow and syntax)
+    "SLF001",  # No start with single underscore outside defining module
+    "T10",     # flake8-debugger (forbid breakpoint/debugger calls)
+    "T20",     # flake8-print (forbids print statements; forces logging)
+    "TID",     # flake8-tidy-imports (forces clean absolute imports)
+    "TRY",     # tryceratops (exception handling hygiene)
+    "UP",      # Modern Python idioms
+    "W",       # Catches stylistic choices that harm readability
+]
+ignore = [
+    "COM812",   # Let Ruff format own trailing commas to avoid formatter conflicts
+    "PLR2004",  # Allow 'magic values" (unnamed numbers)
+    "S607",     # Allow resolving git/uv from PATH
+]
+fixable = ["ALL"]
+unfixable = []
+
+# Prevent structural bloat
+[tool.ruff.lint.mccabe]
+max-complexity = 8           # Hard path-count limit for functions
+
+# Prevent unreadable complexity and code
+[tool.ruff.lint.pylint]
+max-nested-blocks = 3        # Stop indentation madness
+max-positional-args = 4      # Max total params, to prevent big initializers. Match max-args so no def(*)
+max-args = 4                 # Do not build big object initializers.
+max-public-methods = 5       # Cap public methods per class
+max-statements = 25          # Cap executable statements per function/method
+max-branches = 6             # Cap branching paths per function/method; long if/elif chains are banned
+max-returns = 4              # Cap return exits per function/method
+max-locals = 10              # Cap local variable sprawl per function/method
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"  # Enforce absolute imports
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"typing.cast".msg = "Do not use cast(); fix the type at the boundary instead."
+"re".msg = "Regex is slow. Use Python built-in string manipulation operations."
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "D100",  # Test modules do not need noisy docstrings
+    "D101",  # Test classes do not need noisy docstrings
+    "D102",  # Test helper methods do not need noisy docstrings
+    "D103",  # Test functions describe behavior through test names
+    "D104",  # Test package boundaries do not need package docstrings
+    "S101",  # Allow 'assert' statements (needed for pytest)
+]
+"harness/**/*.py" = [
+    "S404", # Triggers when code imports subprocess or os related to process spawn
+    "S603"  # Flags execution without a shell
+]
+"tests/harness/conftest.py" = ["S404", "S603"]    # allow shell execution
+"tests/harness/test_ralph.py" = ["S404", "S603"]  # allow shell execution
+"tests/harness/test_cli.py" = ["S404", "S603"]    # allow shell execution

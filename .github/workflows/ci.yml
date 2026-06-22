@@ -1,0 +1,42 @@
+name: gate
+
+# The unbypassable backstop.
+# hook, but this re-runs the same checks on every PR and push, so nothing merges
+# without passing them. Branch protection makes this required.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: uv Sync Dependencies
+        run: uv sync
+
+      - name: Ruff Lint
+        run: uv run ruff check .
+
+      - name: Pylint Structural Rules
+        run: uv run pylint src harness
+
+      - name: Ruff Format Check
+        run: uv run ruff format --check .
+
+      - name: Pyright Type Check
+        run: uv run pyright
+
+      - name: Semgrep Security Scan
+        run: uv run semgrep scan --config auto --config p/secrets --error --quiet .
+
+      - name: Tests with Coverage Gate
+        run: uv run pytest
