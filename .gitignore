@@ -1,0 +1,18 @@
+*.py[cod]
+__pycache__/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+dist/
+.DS_Store
+.claude
+.codex
+.vscode/
+
+.env
+.env.*
+
+# in-repo worker worktrees (isolated agent workspaces; never /tmp)
+.worktrees/
+scratchpad/

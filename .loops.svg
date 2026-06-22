@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 220" width="100%">
+  <style>
+    /* Support system dark/light theme switching automatically */
+    :root {
+      --bg-canvas: #0B1927;
+      --text-main: #ffffff;
+      --text-sub: #adbac7;
+      --border-boundary: #1E4A84;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg-canvas: #f6f8fa;
+        --text-main: #24292e;
+        --text-sub: #586069;
+        --border-boundary: #0366d6;
+      }
+    }
+
+    /* Pulse effect for the critical safety gate */
+    @keyframes gatePulse {
+      0% { stroke: #944710; }
+      50% { stroke: #ff7315; filter: drop-shadow(0 0 4px #ff7315); }
+      100% { stroke: #944710; }
+    }
+    /* Running ants animation for the main success loop */
+    @keyframes flowSuccess {
+      to { stroke-dashoffset: -20; }
+    }
+    /* Flashing alert for the failure fallback loop */
+    @keyframes flowFail {
+      0% { opacity: 0.4; stroke: #cb2431; }
+      50% { opacity: 1; stroke: #ff4d5a; }
+      100% { opacity: 0.4; stroke: #cb2431; }
+    }
+    /* Periodic signal shooting from ralph */
+    @keyframes ralphShoot {
+      0% { stroke-dashoffset: 40; }
+      30% { stroke-dashoffset: 0; }
+      100% { stroke-dashoffset: 0; }
+    }
+
+    .gate-shape { animation: gatePulse 2s infinite ease-in-out; }
+    .success-path { stroke-dasharray: 6, 4; animation: flowSuccess 0.8s linear infinite; }
+    .fail-path { stroke-dasharray: 4, 4; animation: flowFail 1.5s infinite ease-in-out; }
+    .ralph-path { stroke-dasharray: 12, 28; stroke-dashoffset: 40; animation: ralphShoot 3s infinite linear; }
+
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .themed-bg { fill: var(--bg-canvas); stroke: var(--border-boundary); }
+    .themed-text { fill: var(--text-main); }
+    .themed-subtext { fill: var(--text-sub); }
+  </style>
+
+  <!-- Markers for Vector Arrows -->
+  <defs>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#586069" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#28a745" />
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#cb2431" />
+    </marker>
+  </defs>
+
+  <!-- Background Canvas Container -->
+  <rect x="150" y="10" width="460" height="200" class="themed-bg" stroke-width="2" rx="30" />
+  <text x="165" y="32" fill="#1E4A84" font-size="12" font-weight="bold" letter-spacing="1">CODEBASE MEMORY BOUNDARY</text>
+
+  <!-- Node: RALPH (External Harness) -->
+  <g transform="translate(15, 75)">
+    <rect width="105" height="70" fill="#2f363d" stroke="#586069" stroke-width="2" rx="8" />
+    <text x="52" y="28" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">ralph.sh</text>
+    <text x="52" y="44" fill="#adbac7" font-size="11" text-anchor="middle">start worker</text>
+    <text x="52" y="58" fill="#adbac7" font-size="11" text-anchor="middle">send PROMPT</text>
+  </g>
+
+  <!-- Node: WORKER -->
+  <g transform="translate(175, 85)">
+    <rect width="100" height="50" fill="#1f242c" stroke="#444c56" stroke-width="1.5" rx="4" />
+    <text x="50" y="24" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">WORKER</text>
+    <text x="50" y="40" fill="#79818b" font-size="11" text-anchor="middle">+ specs</text>
+  </g>
+
+  <!-- Node: GATE -->
+  <g transform="translate(340, 80)">
+    <polygon points="50,0 100,30 50,60 0,30" fill="#2E1809" stroke="#944710" stroke-width="2.5" class="gate-shape" />
+    <text x="50" y="34" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">GATE</text>
+  </g>
+
+  <!-- Node: COMMIT -->
+  <g transform="translate(500, 85)">
+    <circle cx="35" cy="25" r="25" fill="#06310A" stroke="#14C014" stroke-width="2" />
+    <text x="35" y="29" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">COMMIT</text>
+  </g>
+
+  <!-- Node: GITHUB REPO (little repository card) -->
+  <g transform="translate(635, 75)">
+    <!-- Main Repo Card Wrapper -->
+    <rect width="90" height="70" fill="#1f242c" stroke="#28a745" stroke-width="2" rx="8" />
+
+    <!-- Code Lines Visual -->
+    <line x1="12" y1="18" x2="35" y2="18" stroke="#586069" stroke-width="2" stroke-linecap="round" />
+    <line x1="12" y1="26" x2="50" y2="26" stroke="#28a745" stroke-width="2" stroke-linecap="round" />
+
+    <!-- Branch Git Tree Icon -->
+    <path d="M 22 55 L 22 38 M 22 44 C 32 44, 32 48, 32 50" stroke="#79818b" stroke-width="1.5" fill="none" />
+    <circle cx="22" cy="38" r="2.5" fill="#1f242c" stroke="#79818b" stroke-width="1.5" />
+    <circle cx="22" cy="55" r="2.5" fill="#1f242c" stroke="#79818b" stroke-width="1.5" />
+    <circle cx="32" cy="52" r="2.5" fill="#28a745" stroke="#28a745" />
+
+    <!-- Label -->
+    <text x="60" y="47" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">Repo</text>
+    <text x="60" y="59" fill="#79818b" font-size="9" text-anchor="middle">main</text>
+  </g>
+
+  <!-- Connections & Animated Paths -->
+  <!-- Ralph -> Worker Base Line -->
+  <path d="M 120 110 L 170 110" stroke="#30363d" stroke-width="2" fill="none" />
+  <!-- Ralph -> Worker Animated Pulse Line -->
+  <path d="M 120 110 L 170 110" stroke="#586069" stroke-width="2" fill="none" class="ralph-path" marker-end="url(#arrow-gray)" />
+
+  <!-- Worker -> Gate -->
+  <path d="M 275 110 L 335 110" stroke="#28a745" stroke-width="2.5" fill="none" class="success-path" marker-end="url(#arrow-green)" />
+
+  <!-- Gate -> Merge (Passes) -->
+  <path d="M 440 110 L 495 110" stroke="#28a745" stroke-width="2.5" fill="none" class="success-path" marker-end="url(#arrow-green)" />
+  <text x="470" y="102" fill="#28a745" font-size="10" font-weight="bold" text-anchor="middle">passes</text>
+
+  <!-- Merge -> Worker (Loop Re-entry) -->
+  <path d="M 535 85 C 535 45, 225 45, 225 80" stroke="#28a745" stroke-width="2" fill="none" class="success-path" marker-end="url(#arrow-green)" />
+
+  <!-- Merge -> GitHub Repo (pushes) -->
+  <path d="M 570 110 L 630 110" stroke="#28a745" stroke-width="2" fill="none" class="success-path" marker-end="url(#arrow-green)" />
+  <text x="602" y="102" fill="#28a745" font-size="10" font-weight="bold" text-anchor="middle">pushes</text>
+
+  <!-- Gate -> Worker (Fails Fallback) -->
+  <path d="M 390 140 C 390 185, 225 185, 225 140" stroke="#cb2431" stroke-width="2" fill="none" class="fail-path" marker-end="url(#arrow-red)" />
+  <text x="310" y="175" fill="#ff4d5a" font-size="10" font-weight="bold" text-anchor="middle">fails</text>
+</svg>

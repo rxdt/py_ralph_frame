@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 548" width="100%">
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    @keyframes flow { to { stroke-dashoffset: -24; } }
+    @keyframes twinkle { 0%,100% { opacity: 0.2; } 50% { opacity: 0.8; } }
+    .ring      { stroke-dasharray: 8, 7; animation: flow 1.4s linear infinite; }
+    .flow      { stroke-dasharray: 6, 5; animation: flow 0.9s linear infinite; }
+    .flow-fail { stroke-dasharray: 4, 3; animation: flow 1.4s linear infinite; }
+    .twinkle   { animation: twinkle 2.8s infinite ease-in-out; }
+  </style>
+
+  <defs>
+    <radialGradient id="sunG">
+      <stop offset="0%" stop-color="#fffdf5" />
+      <stop offset="45%" stop-color="#ffd35a" />
+      <stop offset="100%" stop-color="#ffd35a" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="claudeG"><stop offset="0%" stop-color="#c08bff" stop-opacity="0.5" /><stop offset="100%" stop-color="#c08bff" stop-opacity="0" /></radialGradient>
+    <radialGradient id="deepseekG"><stop offset="0%" stop-color="#5b8cff" stop-opacity="0.5" /><stop offset="100%" stop-color="#5b8cff" stop-opacity="0" /></radialGradient>
+    <radialGradient id="codexG"><stop offset="0%" stop-color="#46d6e6" stop-opacity="0.5" /><stop offset="100%" stop-color="#46d6e6" stop-opacity="0" /></radialGradient>
+
+    <marker id="a-claude" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="#c08bff" /></marker>
+    <marker id="a-deepseek" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="#5b8cff" /></marker>
+    <marker id="a-codex" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="#46d6e6" /></marker>
+    <marker id="a-push" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="#5be09a" /></marker>
+    <marker id="a-fail" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="#ff5d7a" /></marker>
+
+    <path id="clOrbit" d="M 150 204 A 66 66 0 1 1 150 336 A 66 66 0 1 1 150 204" />
+    <path id="dsOrbit" d="M 380 204 A 66 66 0 1 1 380 336 A 66 66 0 1 1 380 204" />
+    <path id="cxOrbit" d="M 610 204 A 66 66 0 1 1 610 336 A 66 66 0 1 1 610 204" />
+  </defs>
+
+  <rect x="0" y="0" width="730" height="548" fill="#0d1018" />
+  <g fill="#cfd8ff">
+    <circle cx="50" cy="60" r="1.2" class="twinkle" />
+    <circle cx="690" cy="80" r="1.3" opacity="0.5" />
+    <circle cx="60" cy="430" r="1.1" opacity="0.6" />
+    <circle cx="700" cy="420" r="1.2" class="twinkle" />
+    <circle cx="345" cy="40" r="1" opacity="0.5" />
+  </g>
+
+  <text x="365" y="32" fill="#f1eefb" font-size="15" font-weight="bold" text-anchor="middle">One Ralph, three workers, one repo</text>
+
+  <!-- Ralph: the sun at the top -->
+  <circle cx="365" cy="86" r="56" fill="url(#sunG)" />
+  <circle cx="365" cy="86" r="32" fill="#ffd35a" />
+  <circle cx="365" cy="86" r="36" fill="none" stroke="#ffd35a" stroke-opacity="0.5">
+    <animate attributeName="r" values="36;46;36" dur="3s" repeatCount="indefinite" />
+    <animate attributeName="stroke-opacity" values="0.5;0;0.5" dur="3s" repeatCount="indefinite" />
+  </circle>
+  <text x="365" y="92" fill="#3a2a00" font-size="15" font-weight="bold" text-anchor="middle">RALPH</text>
+
+  <!-- Ralph -> each worker -->
+  <path d="M 340 116 C 280 150, 200 170, 154 204" stroke="#c08bff" stroke-width="2" fill="none" class="flow" marker-end="url(#a-claude)" />
+  <path d="M 365 142 L 378 204" stroke="#5b8cff" stroke-width="2" fill="none" class="flow" marker-end="url(#a-deepseek)" />
+  <path d="M 390 116 C 450 150, 560 170, 606 204" stroke="#46d6e6" stroke-width="2" fill="none" class="flow" marker-end="url(#a-codex)" />
+
+  <!-- ============ CLAUDE loop ============ -->
+  <circle cx="150" cy="270" r="66" fill="url(#claudeG)" stroke="#c08bff" stroke-width="2.5" class="ring" />
+  <text x="150" y="276" fill="#c08bff" font-size="16" font-weight="bold" text-anchor="middle">Claude</text>
+  <circle r="6" fill="#c08bff"><animateMotion dur="5s" repeatCount="indefinite"><mpath href="#clOrbit" /></animateMotion></circle>
+  <path d="M 150 336 C 118 376, 60 360, 104 312" stroke="#ff5d7a" stroke-width="1.8" fill="none" class="flow-fail" marker-end="url(#a-fail)" />
+  <text x="84" y="376" fill="#ff7d95" font-size="11" font-weight="bold" text-anchor="middle">fail</text>
+  <circle cx="150" cy="336" r="5.5" fill="#ffb43b"><animate attributeName="r" values="5.5;7.5;5.5" dur="1.6s" repeatCount="indefinite" /></circle>
+  <path d="M 150 340 C 185 404, 300 436, 356 454" stroke="#5be09a" stroke-width="2" fill="none" class="flow" marker-end="url(#a-push)" />
+
+  <!-- ============ DEEPSEEK loop ============ -->
+  <circle cx="380" cy="270" r="66" fill="url(#deepseekG)" stroke="#5b8cff" stroke-width="2.5" class="ring" />
+  <text x="380" y="276" fill="#5b8cff" font-size="16" font-weight="bold" text-anchor="middle">Gemini</text>
+  <circle r="6" fill="#5b8cff"><animateMotion dur="6.2s" repeatCount="indefinite"><mpath href="#dsOrbit" /></animateMotion></circle>
+  <path d="M 380 336 C 348 376, 290 360, 334 312" stroke="#ff5d7a" stroke-width="1.8" fill="none" class="flow-fail" marker-end="url(#a-fail)" />
+  <text x="314" y="376" fill="#ff7d95" font-size="11" font-weight="bold" text-anchor="middle">fail</text>
+  <circle cx="380" cy="336" r="5.5" fill="#ffb43b"><animate attributeName="r" values="5.5;7.5;5.5" dur="1.6s" repeatCount="indefinite" /></circle>
+  <path d="M 380 340 L 380 452" stroke="#5be09a" stroke-width="2" fill="none" class="flow" marker-end="url(#a-push)" />
+
+  <!-- ============ CODEX loop ============ -->
+  <circle cx="610" cy="270" r="66" fill="url(#codexG)" stroke="#46d6e6" stroke-width="2.5" class="ring" />
+  <text x="610" y="276" fill="#46d6e6" font-size="16" font-weight="bold" text-anchor="middle">Codex</text>
+  <circle r="6" fill="#46d6e6"><animateMotion dur="7s" repeatCount="indefinite"><mpath href="#cxOrbit" /></animateMotion></circle>
+  <path d="M 610 336 C 642 376, 700 360, 656 312" stroke="#ff5d7a" stroke-width="1.8" fill="none" class="flow-fail" marker-end="url(#a-fail)" />
+  <text x="676" y="376" fill="#ff7d95" font-size="11" font-weight="bold" text-anchor="middle">fail</text>
+  <circle cx="610" cy="336" r="5.5" fill="#ffb43b"><animate attributeName="r" values="5.5;7.5;5.5" dur="1.6s" repeatCount="indefinite" /></circle>
+  <path d="M 610 340 C 575 404, 460 436, 404 454" stroke="#5be09a" stroke-width="2" fill="none" class="flow" marker-end="url(#a-push)" />
+
+  <!-- GitHub repo (Octocat) at the bottom -->
+  <circle cx="380" cy="492" r="38" fill="#f4f4f6" />
+  <g transform="translate(357.6, 469.6) scale(2.8)" fill="#14141a">
+    <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.27-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8z" />
+  </g>
+  <text x="380" y="544" fill="#c9d1e0" font-size="12" font-weight="bold" text-anchor="middle">GitHub &#183; main</text>
+</svg>
