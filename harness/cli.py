@@ -22,31 +22,29 @@ def report(problems: list[str]) -> int:
     return 0
 
 
-def reset_project(pyproject: Path, name: str) -> None:
-    """Replace the scaffold's [project] table with a minimal one for the new project."""
+def set_project_name(pyproject: Path, name: str) -> None:
+    """Rename the project in-place: rewrite the `name =` line under [project]."""
     lines = pyproject.read_text(encoding="utf-8").splitlines(keepends=True)
     start = next(index for index, line in enumerate(lines) if line.startswith("[project]"))
-    after = enumerate(lines[start + 1 :], start + 1)
-    end = next((index for index, line in after if line.startswith("[")), len(lines))
-    block = (
-        f'[project]\nname = "{name}"\nversion = "0.0.0"\nrequires-python = ">=3.13"\ndependencies = []\n\n'
-    )
-    lines[start:end] = [block]
+    target = next(index for index in range(start + 1, len(lines)) if lines[index].startswith("name ="))
+    lines[target] = f'name = "{name}"\n'
     pyproject.write_text("".join(lines), encoding="utf-8")
 
 
-def run_install(repo: Path, name: str | None = None) -> int:
-    """Install dependencies and set the git hooks path; with a name, also reset and detach."""
+def initialize_project(repo: Path) -> int:
+    """Install dependencies and point git at the tracked hooks directory."""
     subprocess.run(("uv", "sync"), cwd=str(repo), check=True)
-    if name is not None:
-        reset_project(repo / "pyproject.toml", name)
-        detach = ("git", "-C", str(repo), "remote", "remove", "origin")
-        subprocess.run(detach, check=False, capture_output=True)
-        sys.stderr.write(f"renamed to '{name}'; folder rename: cd .. && mv {repo.name} {name}\n")
     command = ("git", "-C", str(repo), "config", "core.hooksPath", ".githooks")
     subprocess.run(command, check=True)
     sys.stderr.write("ok: dependencies synced and git hooks path set to .githooks\n")
     return 0
+
+
+def run_install(repo: Path, name: str | None = None) -> int:
+    """Set up the current repo: optionally rename the project, then sync deps and set hooks."""
+    if name is not None:
+        set_project_name(repo / "pyproject.toml", name)
+    return initialize_project(repo)
 
 
 def run_status(repo: Path) -> int:
@@ -66,10 +64,12 @@ def main(argv: list[str] | None = None) -> int:
     """Dispatch a ralph command."""
     args = sys.argv[1:] if argv is None else argv
     if len(args) == 1 and args[0] in GATES:
-        return report(GATES[args[0]](Path.cwd()))
-    if args and args[0] == "install" and len(args) <= 2:
-        return run_install(Path.cwd(), args[1] if len(args) == 2 else None)
-    if args == ["status"]:
-        return run_status(Path.cwd())
-    sys.stderr.write("usage: ralph [gate|verify|install|status]\n")
-    return 2
+        result = report(GATES[args[0]](Path.cwd()))
+    elif args and args[0] == "install" and len(args) <= 2:
+        result = run_install(Path.cwd(), args[1] if len(args) == 2 else None)
+    elif args == ["status"]:
+        result = run_status(Path.cwd())
+    else:
+        sys.stderr.write("usage: ralph [gate|verify|install [name]|status]\n")
+        result = 2
+    return result

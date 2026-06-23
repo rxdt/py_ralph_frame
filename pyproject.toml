@@ -1,8 +1,8 @@
 [project]
-name = "rxdt"
+name = "ralph-harness"
 version = "0.1.0"
 description = "Gated, harnessed, single-worker autonomy loop (Ralph) scaffold for starting new Python projects."
-authors = []
+authors = [{ name = "rxdt" }]
 readme = "README.md"
 requires-python = ">=3.13"
 license = { text = "MIT" }
@@ -21,6 +21,12 @@ dependencies = [
 
 [project.scripts]
 ralph = "harness.cli:main"
+ralph-harness = "harness.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/rxdt/py_ralph_frame"
+Repository = "https://github.com/rxdt/py_ralph_frame"
+Issues = "https://github.com/rxdt/py_ralph_frame/issues"
 
 [build-system]
 requires = ["hatchling"]

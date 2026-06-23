@@ -2,6 +2,9 @@
 
 OPTIONAL for humans to use or edit!
 
+Agents in the loop cannot edit this file (it is in `FORBIDDEN_PATHS` via `harness/`); humans edit or
+delete it directly.
+
 This module enforces the repo owner's structural style hates:  derscore-prefixed names, star unpacking,
 pointless classes, and oversized modules.
 

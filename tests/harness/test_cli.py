@@ -76,22 +76,22 @@ def test_install_syncs_deps_and_sets_hooks(monkeypatch: pytest.MonkeyPatch, git_
     assert out.strip() == ".githooks"
 
 
-def test_install_resets_project(monkeypatch: pytest.MonkeyPatch, git_repo: Path) -> None:
-    """install <name> syncs deps, resets the [project] table, strips metadata, and sets hooks."""
+def test_install_name_renames_project_in_place(monkeypatch: pytest.MonkeyPatch, git_repo: Path) -> None:
+    """install <name> rewrites the project name in the current pyproject, keeping [project.scripts]."""
     monkeypatch.chdir(git_repo)
     (git_repo / "pyproject.toml").write_text(
-        '[project]\nname = "scaffold"\nauthors = [{ name = "rxdt" }]\n\n[tool.ruff]\nline-length = 110\n',
+        '[project]\nname = "ralph-harness"\nversion = "0.1.0"\n\n'
+        '[project.scripts]\nralph = "harness.cli:main"\n',
         encoding="utf-8",
     )
     calls: list[tuple[str, ...]] = []
     monkeypatch.setattr(cli.subprocess, "run", passthrough_skip_uv(subprocess.run, calls))
-    assert cli.main(["install", "demo"]) == 0
+    assert cli.main(["install", "myproj"]) == 0
     assert ("uv", "sync") in calls
     monkeypatch.undo()
     text = (git_repo / "pyproject.toml").read_text(encoding="utf-8")
-    assert 'name = "demo"' in text
-    assert "rxdt" not in text
-    assert "[tool.ruff]" in text
+    assert 'name = "myproj"' in text
+    assert 'ralph = "harness.cli:main"' in text
     out = run_cmd(["git", "config", "core.hooksPath"], git_repo)
     assert out.strip() == ".githooks"
 

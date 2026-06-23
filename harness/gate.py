@@ -1,6 +1,6 @@
 """Gate and verify: staged quality checks plus loop containment.
 
-`run_gate` is the pre-commit gate — fast lint/format for everyone, plus containment (protected
+`run_gate` is the pre-commit gate — fast lint/format for everyone, plus containment (forbidden
 paths, banned patterns, preferences limits) for the autonomous loop when ``RALPH_LOOP`` is set
 (``harness/ralph.sh`` exports it). `run_verify` is the heavier pre-push / CI pass: types, security
 (semgrep), tests, and 100% coverage.
@@ -43,7 +43,7 @@ FULL_CHECKS: Checks = (
     ("tests", ("uv", "run", "pytest")),
 )
 
-PROTECTED_PATHS = (
+FORBIDDEN_PATHS = (
     "AGENTS.md",
     "harness/*",
     "tests/harness/*",
@@ -51,9 +51,6 @@ PROTECTED_PATHS = (
     ".github/*",
     "pyproject.toml",
 )
-
-# preferences.py is the user-tunable knobs file: optional, and the loop is allowed to edit it.
-UNPROTECTED_PATHS = ("harness/preferences.py",)
 
 FORBIDDEN_PATTERNS = (
     "noqa",
@@ -95,8 +92,7 @@ def agent_violations(repo: Path, files: list[str]) -> list[str]:
     problems = [
         f"protected path modified: {path}"
         for path in files
-        if any(fnmatch.fnmatch(path, pattern) for pattern in PROTECTED_PATHS)
-        and path not in UNPROTECTED_PATHS
+        if any(fnmatch.fnmatch(path, pattern) for pattern in FORBIDDEN_PATHS)
     ]
     problems.extend(
         f"banned pattern '{pattern}' in added line: {line.strip()}"

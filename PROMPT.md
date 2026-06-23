@@ -5,11 +5,9 @@ You are one fresh-context iteration of the loop. The repo is your memory.
 1. Read `specs/` — that is what we must build
 2. First run the gate: `uv run ruff check . && uv run ruff format --check . && uv run pytest`. If it is red (lint, format, tests, or <100% coverage on any file with code), fixing it IS the single most important thing — do that this iteration before anything else.
 3. Otherwise, survey the code. Find the single most important thing the specs require that the code does not yet do (or does wrong).
-4. Do exactly that one thing. Keep the change small.
-5. Work in the current checkout. Do not create a worktree unless the user explicitly asked for one.
-   If `git status --short` is dirty before your own edits, stop and report the dirty paths instead
-   of hiding work on another branch.
-6. Ensure tests and lint pass. Add or update a test that proves your change works. Write tests which challenge the source code.
+4. Do exactly the most gap you identified from the code and `specs`. Keep the change small.
+5. Work in the current checkout. Do not create a worktree unless the user explicitly asked for one. If the working tree is dirty before your iteration, commit or stash it depending on whether the specs require that work.
+6. Ensure tests and lint pass. Add or update a test that proves your change works. Write tests which challenge the source code. Do not create test theater to say you got to 100% code coverage. Add tests or asserts, do not delete tests.
 7. Commit directly on the current branch through the normal git hook. Do not call nonexistent
    integration helpers. If the user explicitly asked for a branch/worktree, rebase it onto `main`,
    run the full gate there, then fast-forward merge with `git merge --ff-only <branch>`.

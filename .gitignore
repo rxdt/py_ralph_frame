@@ -9,6 +9,7 @@ dist/
 .claude
 .codex
 .vscode/
+docs/launch.md
 
 .env
 .env.*

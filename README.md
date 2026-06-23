@@ -2,7 +2,8 @@
 <img src="banner.svg" alt="Blue infinity loop" width="360">
 
 <h1>L∞PS: A Python Ralph Harness</h1>
-<p>Loosely opinionated scaffold, easy to opt out of, for a gated autonomous agent loop ("Ralph"). No task list, no orchestrator. A dumb Ralph tells an agent "Go!" and hands it a PROMPT. The agent iterates on tasks from specs. One iteration includes pre-commit rules, specs updates, and a push to GitHub.</p>
+<p>No task list, no orchestrator. Just a reusable PROMPT with guards.
+Loosely opinionated scaffold, easy to opt out of features, for a gated autonomous agent loop ("Ralph"). A dumb Ralph tells an agent "Go!" and hands it a PROMPT. The agent iterates on tasks from specs. One iteration includes pre-commit rules, specs updates, and a push to GitHub.</p>
 
 ![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
 ![Status](https://img.shields.io/badge/github-repo-blue?logo=github)
@@ -21,11 +22,12 @@
 
 ## TLDR; Getting Started.
 
-1. `uv run ralph install <your-project-name>`
-2. Write what you want to build in [docs/plan.md](docs/plan.md).
+1. Try the demo: `uvx ralph-harness demo`
+2. Start a project: `uvx ralph-harness install <your-project-name>`
+3. Write what you want to build in [docs/plan.md](docs/plan.md).
    Include statements that you _"want specs created at [specs](specs) and [docs](docs) to be updated but do NOT touch `plan.md`"_. Be specific.
-3. Run the loop: `harness/ralph.sh [max_iterations] [max_minutes] <worker-agent>`
-4. If agents don't get you exactly what you want, trash it, start over, and refine the plan.
+4. Run the loop: `harness/ralph.sh [max_iterations] [max_minutes] <worker-agent>`
+5. If agents don't get you exactly what you want, trash it, start over, and refine the plan.
 
 ---
 
@@ -37,7 +39,7 @@ Agents update their spec and `PROJECT_STATUS` at the end of each iteration. How 
 
 Use with new Python projects or drop the harness and dependencies into an existing project.
 
-1. Run `uv run ralph install <your-project-name>`. Names the project, installs dependencies, and sets up the git hook.
+1. Run `uvx ralph-harness install <your-project-name>`. Names the project, installs dependencies, and sets up the git hook.
 2. Write your grand vision into `docs/plan.md`.
 3. Optionally add the first spec in `specs/`, or have an agent draft the first specs.
 4. Put product code under `src/` and list new source directories in `pyproject.toml [tool.coverage.run]`.
@@ -90,17 +92,17 @@ The repo is the only memory between iterations. Each iteration is a fresh-contex
 
 #### The Gate: Tiered Checks
 
-The safety minimum is in code: `harness/gate.py` holds `PROTECTED_PATHS` and `FORBIDDEN_PATTERNS`; `semgrep` comes from `pyproject.toml`; `harness/preferences.py` holds the style checks other tools can't catch, e.g. `MAX_FUNCTIONS_PER_FILE`. Containment runs when `RALPH_LOOP=1`, which `ralph.sh` sets at each invocation. Humans commit normally while agents in the loop get stronger checks.
+The safety minimum is in code: `harness/gate.py` holds `FORBIDDEN_PATHS` and `FORBIDDEN_PATTERNS`; `semgrep` comes from `pyproject.toml`; `harness/preferences.py` holds the style checks other tools can't catch, e.g. `MAX_FUNCTIONS_PER_FILE`. Containment runs when `RALPH_LOOP=1`, which `ralph.sh` sets at each invocation. Humans commit normally while agents in the loop get stronger checks.
 
 ⚡ `uv run ralph gate` (pre-commit) → fast checks.
-Ruff lint + check format for everyone, _plus_ **containment** for the agents (via `RALPH_LOOP=1` set by `ralph.sh`): `PROTECTED_PATHS` + `FORBIDDEN_PATTERNS` + preferences, including `MAX_FUNCTIONS_PER_FILE`.
+Ruff lint + check format for everyone, _plus_ **containment** for the agents (via `RALPH_LOOP=1` set by `ralph.sh`): `FORBIDDEN_PATHS` + `FORBIDDEN_PATTERNS` + preferences, including `MAX_FUNCTIONS_PER_FILE`.
 
 ✅ `uv run ralph verify` (pre-push) → the heavy quality pass: ruff lint + check format, pyright, pylint, semgrep, pytest @ 100% cov — no containment re-check. CI re-runs these quality checks on every PR and every push to `main` as the backstop.
 
 Humans can use normal `git` commands.
 
-Protected paths — `AGENTS.md`, `harness/`, `tests/harness/`, `.githooks/`, `.github/`,
-`pyproject.toml` — are off-limits; humans own them. The exception is `harness/preferences.py` — the tunable knobs file, which the loop may edit and you may delete.
+Forbidden agent paths — `AGENTS.md`, `harness/`, `tests/harness/`, `.githooks/`, `.github/`,
+`pyproject.toml`,  `harness/preferences`. Humans own them.
 
 ## Layout
 
@@ -130,6 +132,8 @@ scratchpad/     scratch dir agents are pointed at for temp files
 
 5. **100% coverage does not mean good tests.** That is quantity, not quality. If you had the same agents that wrote the code write the tests "green" can mean nothing. Tests should challenge source. _(You can try adding [mutmut](https://mutmut.readthedocs.io/en/latest/))_
 
+6. Suggestions. `chmod 700 ralph.sh` to limit read/run for the script. `chmod 600 pyproject.toml` once it is set how you want. Agents acting as you will not be limited by this but it will stall them and if the file changes you will know why.
+
 ## Commands
 
 ```sh
@@ -139,15 +143,26 @@ uv run ralph install <your-project-name>  # uv sync + set hooks path; with a nam
 uv run ralph status  # print the run registry (scratchpad/ralph_runs.tsv) as a table
 # anything else → prints usage:
 ralph [gate|verify|install|status] (exit 2)
-# Underlying tools the gate calls (also runnable directly):
-uv run ruff check .
-uv run ruff format
-uv run pyright
-uv run pylint harness src
-uv run semgrep scan --config auto --config p/secrets --error --quiet .
-uv run pytest
+# Underlying tools the gate calls
+ruff check .
+ruff format  # to fix add .
+pyright
+pylint harness src
+semgrep scan --config auto --config p/secrets --error --quiet .
+pytest
 # Note: Pydantic is included. Use it.
 ```
+
+#### PyPI install
+
+```sh
+uvx ralph-harness demo
+uvx ralph-harness install <your-project-name>
+```
+
+#### First demo shape
+
+`uvx ralph-harness demo` creates `ralph-demo`, syncs dependencies, installs git hooks, and prints the next command: `cd ralph-demo && uv run ralph status`.
 
 ## For agents
 
