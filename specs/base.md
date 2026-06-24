@@ -1,36 +1,27 @@
-# Example Spec — DELETE OR REPLACE
+# Base Spec
 
-> **REFERENCE.** Template showing the spec shape. Replace this with your first real build track.
-
-Every spec opens with a PRIORITY banner so the loop knows where to spend the next iteration:
-
-- `PRIORITY 1 (active)` — build this now.
-- `PRIORITY 2/3` — next once 1 is done.
-- `BACKSTOP` — don't regress; not a build target.
-- `REFERENCE` — context only.
-- `DEFERRED` — captured, not scheduled.
+> **PRIORITY 1 (active).** Keep the reusable Ralph harness ready for fresh-context loop iterations.
 
 ## Vision
 
-_One paragraph: what this slice is and why it matters._
+This repository is a Python Ralph harness scaffold. A fresh agent should be able to pick an active spec, make one bounded change, and leave the repo resumable without touching human-owned guardrail files.
 
 ## Prioritize These Items
 
-- _The single most important thing the loop should build first._
-- _..._
+- Replace the template spec with concrete Ralph harness direction.
+- Add a test that fails if the active spec regresses into a template.
 
 ## If The Items Above Are Complete, Do These
 
-- _Next-most-important follow-ups._
+- Add product code only after the human plan names a concrete downstream project.
+- Keep harness behavior changes out of agent-owned iterations unless a human assigns them.
 
-## Acceptance signals
+## Acceptance Signals
 
-- _Observable, checkable conditions that prove the slice works (tests green, a command produces X)._
-
-- [ ] highest priority sub-task checklist item
-- [ ] sub-task checklist item
-- [ ] lowest priority sub-task checklist item
+- `specs/base.md` has an active priority banner and no template markers.
+- A non-harness test protects the active spec from template regression.
 
 ## Non-goals
 
-- _What this spec explicitly does not cover, to keep iterations focused._
+- Changing `harness/`, `tests/harness/`, `.githooks/`, `.github/`, `pyproject.toml`, or `AGENTS.md`.
+- Inventing downstream product behavior before the plan asks for it.
