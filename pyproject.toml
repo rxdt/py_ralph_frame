@@ -16,7 +16,20 @@ classifiers = [
     "Topic :: Software Development :: Build Tools",
 ]
 dependencies = [
-    "pydantic"
+    "packaging>=26.2",
+    "pydantic",
+    "tomlkit>=0.15.0",
+    "typer>=0.26.7",
+]
+[dependency-groups]
+dev = [
+    "pylint",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "pyright",
+    "semgrep",
+    "hypothesis"
 ]
 
 [project.scripts]
@@ -37,16 +50,6 @@ packages = [
     "harness",
 ]
 
-[dependency-groups]
-dev = [
-    "pylint",
-    "pytest",
-    "pytest-cov",
-    "ruff",
-    "pyright",
-    "semgrep",
-]
-
 [tool.pyright]
 typeCheckingMode = "strict"
 # Silences third-party untyped library noise
@@ -64,9 +67,8 @@ reportUnusedVariable = "none"         # Handled by Ruff F841
 minversion = "9.0"
 addopts = [
     "-ra",
-    "--cov",
     "--cov-report=term-missing",
-    "--cov-fail-under=100",
+    "--cov-fail-under=100"
 ]
 testpaths = ["tests"]
 pythonpath = ["src"]
@@ -163,7 +165,7 @@ max-complexity = 8           # Hard path-count limit for functions
 
 # Prevent unreadable complexity and code
 [tool.ruff.lint.pylint]
-max-nested-blocks = 3        # Stop indentation madness
+max-nested-blocks = 4        # Stop indentation madness
 max-positional-args = 4      # Max total params, to prevent big initializers. Match max-args so no def(*)
 max-args = 4                 # Do not build big object initializers.
 max-public-methods = 5       # Cap public methods per class
@@ -180,6 +182,7 @@ ban-relative-imports = "all"  # Enforce absolute imports
 "re".msg = "Regex is slow. Use Python built-in string manipulation operations."
 
 [tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["D104"]  # remove if you add logic to these files
 "tests/**/*.py" = [
     "D100",  # Test modules do not need noisy docstrings
     "D101",  # Test classes do not need noisy docstrings
@@ -192,6 +195,4 @@ ban-relative-imports = "all"  # Enforce absolute imports
     "S404", # Triggers when code imports subprocess or os related to process spawn
     "S603"  # Flags execution without a shell
 ]
-"tests/harness/conftest.py" = ["S404", "S603"]    # allow shell execution
-"tests/harness/test_ralph.py" = ["S404", "S603"]  # allow shell execution
-"tests/harness/test_cli.py" = ["S404", "S603"]    # allow shell execution
+"tests/harness/{conftest,test_ralph,test_cli,test_integration}.py" = ["S404", "S603"]    # allow shell execution

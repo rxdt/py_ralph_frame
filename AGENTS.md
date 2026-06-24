@@ -4,7 +4,7 @@
 
 - Work only inside this repository; use `scratchpad/` for temporary files.
 - Do not read, write, or search outside the repo unless the user explicitly asks.
-- Do not edit protected paths: `AGENTS.md`, `harness/` (except `harness/preferences.py`), `tests/harness/`, `.githooks/`, `.github/`, `pyproject.toml`. The gate enforces this; the list lives in `harness/gate.py`. You may edit `harness/preferences.py` — it is the tunable style-knobs file.
+- Do not edit forbidden paths: `AGENTS.md`, `harness/`, `tests/harness/`, `.githooks/`, `.github/`, `pyproject.toml`. The gate enforces this; the list lives in `harness/gate.py`. `harness/preferences.py` is human-owned, like the rest of `harness/`.
 
 ## The loop
 
@@ -12,9 +12,9 @@
 - `specs/` says WHAT to build; with a PRIORITY banner at the top.
 - Read `specs/`, pick the single most important unfinished item: scope it, implement it, commit often. Update the spec to the truth. One tightly scoped change per iteration.
 
-## Safety floor
+## Quality
 
-- The floor is code in `harness/gate.py` (protected). Leave it unchallenged.
+- The quality minimum is code in `harness/gate.py` (forbidden to agents). Leave it unchallenged.
 - Strengthen tests and coverage. Pass lint, type, and gate checks.
 - Avoid lint suppressions, type-ignores, skipped/xfail tests, or broad exception swallowing.
 - Never run destructive git commands (`rm -rf`, `git reset --hard`, `git branch -D`) unless the user  explicitly asks; verify each risky step.
@@ -24,12 +24,12 @@
 
 - `ralph gate` runs on commit — fast lint + format, plus loop containment.
 - Run `uv run ralph verify` often, especially before pushing: lint, format, types, security, tests, 100% coverage.
-- Done means: no protected path touched; `ralph verify` is green; the spec and `docs/PROJECT_STATUS.md` reflect what was built; tests pass, cover the change, and honestly challenge the source code.
+- Done means: no forbidden path touched; `ralph verify` is green; the spec and `docs/PROJECT_STATUS.md` reflect what was built; tests pass, cover the change, and honestly challenge the source code.
 
 ## Documentation
 
-- Every `.md` stays under 100 lines — distill for the next agent.
-- Keep the doc set small: README, AGENTS, `docs/PLAN`, `docs/PROJECT_STATUS`, `specs/`, `PROMPT.md`.
+- Every agent-maintained `.md` (`AGENTS`, `docs/PLAN`, `docs/PROJECT_STATUS`, `specs/`, `PROMPT.md`) stays under 100 lines — distill for the next agent. README is the human landing page and may be longer.
+- Keep the doc set small.
 
 ## Session handoff
 
@@ -81,5 +81,5 @@ Acceptance criteria: Each changed line traces directly to the user's request.
 - Prefer module-level functions over classes; use a dataclass for grouped data or behavior.
 - Avoid AI-bloat like:
   - wrapping literals in their constructors (`"x"`, not `str("x")`; `[]`, not `list([])`)
-  - repeated string normalization (`.lower()`/`.strip()`/`.replace()`)
+  - repeated string normalization (`.strip()`/`.replace()`)
   - overly defensive checks

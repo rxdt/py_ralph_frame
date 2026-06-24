@@ -10,6 +10,8 @@ dist/
 .codex
 .vscode/
 docs/launch.md
+test-results/
+**/node_modules/
 
 .env
 .env.*
@@ -17,3 +19,6 @@ docs/launch.md
 # in-repo worker worktrees (isolated agent workspaces; never /tmp)
 .worktrees/
 scratchpad/
+
+# internal dev notes / deferred TODOs — not shipped, not user-facing
+harness.md

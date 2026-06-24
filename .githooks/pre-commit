@@ -3,4 +3,4 @@
 # Bypassing this hook is forbidden by AGENTS.md.
 set -eu
 
-uv run ralph gate
+uv run --no-sync ralph gate

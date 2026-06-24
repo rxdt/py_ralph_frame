@@ -26,21 +26,36 @@ if TYPE_CHECKING:
 
 type Checks = tuple[tuple[str, tuple[str, ...]], ...]
 
+# `uv run --no-sync` runs tools in the already-synced venv WITHOUT dependency resolution: no sync on
+# every commit/push. Running .venv/bin tools directly instead breaks pyright/semgrep, which rely on
+# the environment uv sets up (VIRTUAL_ENV, python-version detection).
 COMMIT_CHECKS: Checks = (
-    ("lint", ("uv", "run", "ruff", "check", ".")),
-    ("format", ("uv", "run", "ruff", "format", "--check", ".")),
+    ("lint", ("uv", "run", "--no-sync", "ruff", "check", ".")),
+    ("format", ("uv", "run", "--no-sync", "ruff", "format", "--check", ".")),
 )
 
 FULL_CHECKS: Checks = (
-    ("lint", ("uv", "run", "ruff", "check", ".")),
-    ("format", ("uv", "run", "ruff", "format", "--check", ".")),
-    ("types", ("uv", "run", "pyright")),
-    ("pylint", ("uv", "run", "pylint", "harness", "src")),
+    ("lint", ("uv", "run", "--no-sync", "ruff", "check", ".")),
+    ("format", ("uv", "run", "--no-sync", "ruff", "format", "--check", ".")),
+    ("types", ("uv", "run", "--no-sync", "pyright")),
+    ("pylint", ("uv", "run", "--no-sync", "pylint", "harness", "src")),
     (
         "security",
-        ("uv", "run", "semgrep", "scan", "--config", "auto", "--config", "p/secrets", "--error", "--quiet"),
+        (
+            "uv",
+            "run",
+            "--no-sync",
+            "semgrep",
+            "scan",
+            "--config",
+            "auto",
+            "--config",
+            "p/secrets",
+            "--error",
+            "--quiet",
+        ),
     ),
-    ("tests", ("uv", "run", "pytest")),
+    ("tests", ("uv", "run", "--no-sync", "pytest")),
 )
 
 FORBIDDEN_PATHS = (
@@ -50,12 +65,28 @@ FORBIDDEN_PATHS = (
     ".githooks/*",
     ".github/*",
     "pyproject.toml",
+    "PROMPT.md",
+    "docs/plan.md",
+    "uv.lock",
+    # tooling-config shadow files that would override or weaken the checks set in pyproject.toml
+    "pytest.ini",
+    "tox.ini",
+    "setup.cfg",
+    ".coveragerc",
+    "ruff.toml",
+    ".ruff.toml",
+    ".semgrepignore",
+    "pyrightconfig.json",
+    ".pylintrc",
+    ".gitmodules",
 )
 
 FORBIDDEN_PATTERNS = (
     "noqa",
     "type: ignore",
     "type:ignore",
+    "pyright: ignore",
+    "mypy: ignore",
     "pragma: no cover",
     "eslint-disable",
     "ts-ignore",
@@ -88,9 +119,9 @@ def staged_preferences_violations(repo: Path) -> list[str]:
 
 
 def agent_violations(repo: Path, files: list[str]) -> list[str]:
-    """Flag protected-path, banned-pattern, and preferences issues for a loop commit."""
+    """Flag forbidden-path, banned-pattern, and preferences issues for a loop commit."""
     problems = [
-        f"protected path modified: {path}"
+        f"forbidden path modified: {path}"
         for path in files
         if any(fnmatch.fnmatch(path, pattern) for pattern in FORBIDDEN_PATHS)
     ]
@@ -98,7 +129,7 @@ def agent_violations(repo: Path, files: list[str]) -> list[str]:
         f"banned pattern '{pattern}' in added line: {line.strip()}"
         for line in staged_added_lines(repo)
         for pattern in FORBIDDEN_PATTERNS
-        if pattern in line
+        if pattern.lower() in line.lower()  # case-insensitive so mixed-case hatches are still caught
     )
     problems.extend(staged_preferences_violations(repo))
     return problems

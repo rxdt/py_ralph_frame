@@ -2,10 +2,9 @@
 
 OPTIONAL for humans to use or edit!
 
-Agents in the loop cannot edit this file (it is in `FORBIDDEN_PATHS` via `harness/`); humans edit or
-delete it directly.
+Agents in the loop cannot edit this file (it is in `FORBIDDEN_PATHS` via `harness/`); humans own it.
 
-This module enforces the repo owner's structural style hates:  derscore-prefixed names, star unpacking,
+This module enforces the repo owner's structural style hates:  underscore-prefixed names, star unpacking,
 pointless classes, and oversized modules.
 
 Use this file ONLY for rules that ruff, pylint, and pyright cannot express but you want enforced. Keep short.
@@ -16,7 +15,7 @@ from __future__ import annotations
 
 import ast
 
-MAX_FUNCTIONS_PER_FILE = 5  # low, conservatice, prevents lazy agent code
+MAX_FUNCTIONS_PER_FILE = 5  # low, conservative, prevents lazy agent code
 
 
 def underscore_violations(path: str, tree: ast.Module) -> list[str]:
@@ -45,7 +44,9 @@ def star_violations(path: str, tree: ast.Module) -> list[str]:
         elif isinstance(node, ast.keyword) and node.arg is None:
             problems.append(f"{path}:{node.lineno}: double-star unpacking; pass explicit arguments")
         elif isinstance(node, ast.arguments) and (node.vararg or node.kwarg):
-            problems.append(f"{path}: signature uses *args or **kwargs; declare explicit parameters")
+            splat = node.vararg or node.kwarg
+            lineno = splat.lineno if splat else 0
+            problems.append(f"{path}:{lineno}: signature uses *args or **kwargs; declare explicit parameters")
     return problems
 
 

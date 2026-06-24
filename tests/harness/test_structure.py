@@ -54,6 +54,8 @@ def test_star_signatures_flagged() -> None:
     problems = star_violations("m.py", parse(source))
     assert len(problems) == 2
     assert all("signature" in problem for problem in problems)
+    assert any(problem.startswith("m.py:1:") for problem in problems)
+    assert any(problem.startswith("m.py:5:") for problem in problems)
 
 
 def test_pointless_class_flagged() -> None:

@@ -11,11 +11,13 @@ if TYPE_CHECKING:
 
 
 def clean_git_env() -> dict[str, str]:
-    """Return the environment without GIT_* variables.
+    """Copy of os.environ with every GIT_* variable removed.
 
-    Git exports GIT_DIR and GIT_INDEX_FILE to hook processes; anything the
-    gate spawns must not inherit them, or nested git calls (including the
-    test suite's own fixtures) operate on the committing repo instead.
+    A git hook runs with GIT_DIR and GIT_INDEX_FILE already set to the repo
+    doing the commit. Those vars override `git -C <path>`, so any git command
+    we spawn would read/write that committing repo instead of <path> -- and the
+    test fixtures' temp repos would clobber the real one. Dropping GIT_* makes
+    `-C <path>` win again.
     """
     return {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
 
@@ -30,7 +32,7 @@ def run_git(repo: Path, args: list[str]) -> str:
 
 def staged_files(repo: Path) -> list[str]:
     """Return paths staged for commit, relative to the repo root."""
-    out = run_git(repo, ["diff", "--cached", "--name-only", "--diff-filter=ACMRD"])
+    out = run_git(repo, ["diff", "--cached", "--name-only", "--no-renames", "--diff-filter=ACMRD"])
     return [line for line in out.splitlines() if line]
 
 

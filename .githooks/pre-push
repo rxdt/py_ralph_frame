@@ -5,4 +5,4 @@
 # Bypassing this hook is forbidden by AGENTS.md.
 set -eu
 
-uv run ralph verify
+uv run --no-sync ralph verify

@@ -24,19 +24,19 @@ jobs:
         run: uv sync
 
       - name: Ruff Lint
-        run: uv run ruff check .
+        run: uv run --no-sync ruff check .
 
       - name: Pylint Structural Rules
-        run: uv run pylint src harness
+        run: uv run --no-sync pylint src harness
 
       - name: Ruff Format Check
-        run: uv run ruff format --check .
+        run: uv run --no-sync ruff format --check .
 
       - name: Pyright Type Check
-        run: uv run pyright
+        run: uv run --no-sync pyright
 
       - name: Semgrep Security Scan
-        run: uv run semgrep scan --config auto --config p/secrets --error --quiet .
+        run: uv run --no-sync semgrep scan --config auto --config p/secrets --error --quiet .
 
       - name: Tests with Coverage Gate
-        run: uv run pytest
+        run: uv run --no-sync pytest  --cov
