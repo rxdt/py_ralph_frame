@@ -12,6 +12,7 @@ from typing import Annotated
 import tomlkit
 import typer
 from packaging.utils import canonicalize_name
+from rich import print as rprint
 
 from harness import gate as gate_module
 
@@ -41,12 +42,7 @@ def run_worker(command: list[str], cwd: Path, log: Path, verbose: bool) -> int:
         if not verbose:
             return subprocess.run(command, cwd=str(cwd), stdout=handle, check=False).returncode
         jq = shutil.which("jq")
-        with subprocess.Popen(
-            command,
-            cwd=str(cwd),
-            stdout=subprocess.PIPE,
-            text=True,
-        ) as process:
+        with subprocess.Popen(command, cwd=str(cwd), stdout=subprocess.PIPE, text=True) as process:
             for line in process.stdout or ():
                 handle.write(line)
                 handle.flush()
@@ -59,11 +55,7 @@ def format_live_line(line: str, jq: str | None) -> str:
     """Compact valid JSONL for terminal output; preserve invalid lines exactly."""
     if jq:
         rendered = subprocess.run(
-            (jq, "-C", "-c", "."),
-            input=line,
-            text=True,
-            capture_output=True,
-            check=False,
+            (jq, "-C", "-c", "."), input=line, text=True, capture_output=True, check=False
         )
         if rendered.returncode == 0 and rendered.stdout:
             return rendered.stdout
@@ -103,17 +95,36 @@ def status() -> None:
         typer.secho(f"newest: {logs[-1]}", fg=typer.colors.GREEN, bold=True)
 
 
-@app.command(help="Setup project: rename in pyproject, sync deps, point git at .githooks")
+@app.command(help="Setup project: inject project name, sync dependencies, set up githooks")
 def install(name: str) -> None:
     """Inject NAME (PEP 503) into pyproject, sync deps, and activate the git hooks."""
     cwd = Path.cwd()
+
     pyproject = cwd / "pyproject.toml"
     document = tomlkit.parse(pyproject.read_text(encoding="utf-8"))
     document.setdefault("project", tomlkit.table())["name"] = canonicalize_name(name, validate=True)
     pyproject.write_text(tomlkit.dumps(document), encoding="utf-8")
+    new_name = tomlkit.parse(pyproject.read_text(encoding="utf-8"))["project"]["name"]
+    rprint(f"\n[cyan2]project name[/cyan2] '{new_name}' set in `pyproject.toml`")
+
+    rprint("\n[cyan2]installing dependencies[/cyan2] with `uv sync`")
     subprocess.run(("uv", "sync"), cwd=str(cwd), check=True)
-    subprocess.run(("git", "-C", str(cwd), "config", "core.hooksPath", ".githooks"), check=True)
-    typer.echo("ok: project named, deps synced, git hooks path set to .githooks", err=True)
+
+    rprint("\n[cyan2]setting git hooks[/cyan2] with `git config core.hooksPath .githooks`:")
+    subprocess.run(("git", "config", "core.hooksPath", ".githooks"), cwd=str(cwd), check=True)
+    typer.echo(
+        subprocess.run(
+            ("git", "config", "core.hooksPath"), cwd=str(cwd), capture_output=True, text=True, check=True
+        ).stdout.strip()
+    )
+    subprocess.run(("ls", "-l", ".githooks"), cwd=str(cwd), check=True)
+
+    rprint(
+        "\n[turquoise2]You must ACTIVATE env[/turquoise2] `source .venv/bin/activate`"
+        " to use the [green]`harness`[/green] command.\n"
+        "\n[turquoise2]python:[/turquoise2] project supports >=3.11"
+        "\n[turquoise2]PIN NEWER[/turquoise2] local Python e.g. `uv python pin 3.13 && uv sync`"
+    )
 
 
 @app.command(help="Run one harnessed ralph loop with <agent>, e.g. harness run claude 3 20")

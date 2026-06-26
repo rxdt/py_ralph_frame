@@ -6,6 +6,7 @@ from __future__ import annotations
 import io
 import os
 import subprocess
+import tomllib
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -217,9 +218,21 @@ def test_install_renames_syncs_and_sets_hooks(monkeypatch: pytest.MonkeyPatch, g
     (git_repo / "pyproject.toml").write_text('[project]\nname = "old"\n', encoding="utf-8")
     calls: list[tuple[str, ...]] = []
     monkeypatch.setattr(subprocess, "run", stub_toolchain(subprocess.run, calls))
-    assert runner.invoke(cli.app, ["install", "My_Cool.Project"]).exit_code == 0
+    result = runner.invoke(cli.app, ["install", "My_Cool.Project"])
+    assert result.exit_code == 0
     assert ("uv", "sync") in calls
-    assert 'name = "my-cool-project"' in (git_repo / "pyproject.toml").read_text(encoding="utf-8")
+    assert ("git", "config", "core.hooksPath", ".githooks") in calls
+    assert ("git", "config", "core.hooksPath") in calls
+    assert ("ls", "-l", ".githooks") in calls
+    with (git_repo / "pyproject.toml").open("rb") as handle:
+        assert tomllib.load(handle)["project"]["name"] == "my-cool-project"
+    assert "project name 'my-cool-project' set in `pyproject.toml`" in result.output
+    assert "installing dependencies with `uv sync`" in result.output
+    assert "setting git hooks with `git config core.hooksPath .githooks`" in result.output
+    assert ".githooks" in result.output
+    assert "You must ACTIVATE env `source .venv/bin/activate` to use the `harness` command." in result.output
+    assert "python: project supports >=3.11" in result.output
+    assert "PIN NEWER local Python e.g. `uv python pin 3.13 && uv sync`" in result.output
     monkeypatch.undo()
     assert run_cmd(["git", "config", "core.hooksPath"], git_repo).strip() == ".githooks"
 

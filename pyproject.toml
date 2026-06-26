@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Gated, harnessed, single-worker autonomy loop (Ralph) scaffold for starting new Python projects."
 authors = [{ name = "rxdt" }]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 keywords = ["ralph", "agent", "autonomy", "scaffold", "harness", "llm", "codex", "claude"]
 classifiers = [
@@ -12,14 +12,16 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Build Tools",
 ]
 dependencies = [
-    "packaging>=26.2",
+    "packaging",
     "pydantic",
-    "tomlkit>=0.15.0",
-    "typer>=0.26.7",
+    "tomlkit",
+    "typer"
 ]
 [dependency-groups]
 dev = [
@@ -81,7 +83,7 @@ skip_covered = true
 fail_under = 100
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py311"
 preview = true
 line-length = 110
 force-exclude = true

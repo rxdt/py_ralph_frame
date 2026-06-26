@@ -12,6 +12,7 @@ dist/
 docs/launch.md
 test-results/
 **/node_modules/
+.python-version
 
 .env
 .env.*
